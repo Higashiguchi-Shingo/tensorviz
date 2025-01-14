@@ -43,7 +43,8 @@ def df2tts(df, time_key, facets, values=None, sampling_rate="D", start_date=None
     tmp = df.copy(deep=True)
     shape = tmp[facets].nunique().tolist()
     if values == None: values = 'count'; tmp[values] = 1
-    tmp[time_key] = tmp[time_key].round(sampling_rate)
+    tmp[time_key] = tmp[time_key].round(sampling_rate) # Round the timestamp
+
     print("Tensor:")
     print(tmp.nunique()[[time_key] + facets])
 
@@ -54,20 +55,19 @@ def df2tts(df, time_key, facets, values=None, sampling_rate="D", start_date=None
     tts = grouped.values
     tts = np.reshape(tts, (-1, *shape))
 
-    if scale=="full":
+    if scaler=="full":
         # Min-Max scaling
         tts =  minmax_scale(tts.reshape((-1, 1))).reshape(tts.shape)
-    elif scale=="each":
+    elif scaler=="each":
         # Min-Max scaling for each series
         tts = min_max_scale_tensor(tts)
 
     return tts
 
 def min_max_scale_np(array):
-    min = array.min()
-    max = array.max()
-    array = (array - min) / (max - min)
-    return array
+    min_value = array.min()
+    max_value = array.max()
+    return (array - min_value) / (max_value - min_value)
 
 def min_max_scale_tensor(data):
     query_size = data.shape[1]
@@ -77,3 +77,51 @@ def min_max_scale_tensor(data):
         for j in range(geo_size):
             ret[:,i,j] = min_max_scale_np(data[:,i,j])
     return ret
+
+
+def viz_tts_slice(tts, index=None, slice_mode=None):
+    if slice_mode==1:
+        entity_size = tts.shape[1]
+        for entity_index in range(entity_size):
+            plt.figure(figsize=(20, 5))
+            if index:
+                plt.plot(data[:, entity_index, index])
+            else:
+                plt.plot(data[:, entity_index, :])
+            plt.show()
+            plt.close()
+
+    elif slice_mode==2:
+        entity_size = tts.shape[2]
+        for entity_index in range(entity_size):
+            plt.figure(figsize=(20, 5))
+            if index:
+                plt.plot(data[:, :, entity_index])
+            else:
+                plt.plot(data[:, :, entity_index])
+            plt.show()
+            plt.close()
+
+
+def save_tts_slice(tts, save_path, index=None, slice_mode=None):
+    if slice_mode==1:
+        entity_size = tts.shape[1]
+        for entity_index in range(entity_size):
+            plt.figure(figsize=(20, 5))
+            if index:
+                plt.plot(data[:, entity_index, index])
+            else:
+                plt.plot(data[:, entity_index, :])
+            plt.savefig(save_path + f"/mode1_{entity_index}.png")
+            plt.close()
+
+    elif slice_mode==2:
+        entity_size = tts.shape[2]
+        for entity_index in range(entity_size):
+            plt.figure(figsize=(20, 5))
+            if index:
+                plt.plot(data[:, :, entity_index])
+            else:
+                plt.plot(data[:, :, entity_index])
+            plt.savefig(save_path + f"/mode2_{entity_index}.png")
+            plt.close()
