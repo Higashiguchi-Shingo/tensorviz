@@ -85,9 +85,9 @@ def viz_tts_slice(tts, index=None, slice_mode=None):
         for entity_index in range(entity_size):
             plt.figure(figsize=(20, 5))
             if index:
-                plt.plot(data[:, entity_index, index])
+                plt.plot(tts[:, entity_index, index])
             else:
-                plt.plot(data[:, entity_index, :])
+                plt.plot(tts[:, entity_index, :])
             plt.show()
             plt.close()
 
@@ -96,9 +96,9 @@ def viz_tts_slice(tts, index=None, slice_mode=None):
         for entity_index in range(entity_size):
             plt.figure(figsize=(20, 5))
             if index:
-                plt.plot(data[:, :, entity_index])
+                plt.plot(tts[:, :, entity_index])
             else:
-                plt.plot(data[:, :, entity_index])
+                plt.plot(tts[:, :, entity_index])
             plt.show()
             plt.close()
 
